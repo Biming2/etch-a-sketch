@@ -2,48 +2,57 @@ const container = document.getElementById('container');
 const clearBtn = document.getElementById('clear');
 const resetBtn = document.getElementById('reset');
 
-function makeGrid(rows, cols) {
-    container.style.setProperty('--grid-rows', rows);
-    container.style.setProperty('--grid-cols', cols);
+window.addEventListener("load", setDefaultGrid);
+clearBtn.addEventListener('click', clearGrid);
+resetBtn.addEventListener("click", resetGrid);
 
-    for(let i = 0; i < (rows * cols); i++) {
+function setDefaultGrid() {
+    makeGrid(16);
+}
+
+function makeGrid(size) {
+    container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+
+    for(let i = 0; i < (size * size); i++) {
         let cell = document.createElement('div');
-        container.appendChild(cell).className = 'grid-item';
+        cell.classList = 'grid-item';
+        cell.addEventListener('mouseover', generateColor);
+        container.appendChild(cell);
     }
 }
 
-function generateColor() {
+function generateColor(e) {
     let letters = '0123456789ABCDEF';
     let color = '#';
 
     for(let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() *16 )];
+        color += letters[Math.floor(Math.random() * 16)];
     }
 
-    return color;
+    e.target.style.backgroundColor = color;
 }
 
-makeGrid(16, 16);
-//let color = generateColor();
-const gridItems = document.getElementsByClassName('grid-item');
-const gridItemsArray = Array.prototype.slice.call(gridItems);
+function clearGrid() {
+    let gridItems = document.getElementsByClassName('grid-item');
+    let gridItemsArray = Array.prototype.slice.call(gridItems);
 
-gridItemsArray.forEach(item => {
-    item.addEventListener('mouseover', function() {
-        item.style.backgroundColor = generateColor();
-    });
-});
-
-clearBtn.addEventListener('click', function() {
     gridItemsArray.forEach(item => {
         item.style.backgroundColor = 'rgb(26, 29, 41)';
     });
-});
+}
 
-resetBtn.addEventListener('click', function() {
+function resetGrid() {
+    let gridArray = Array.from(container.childNodes);
+
+    gridArray.forEach(item => {
+        container.removeChild(item);
+    });
+
     let gridChoice = 0;
-    while(gridChoice <= 0 || gridChoice >= 100 || isNaN(gridChoice)) {
+    while(gridChoice <= 0 || gridChoice >= 65 || isNaN(gridChoice)) {
         gridChoice = prompt("Choose a number of squares per side for the new grid (1-64):");
     }
-    makeGrid(gridChoice, gridChoice);
-});
+
+    clearGrid();
+    makeGrid(gridChoice);
+}
